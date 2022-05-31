@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Semana10Sales.DOMAIN.Core.Entities;
+using Semana10Sales.DOMAIN.Core.Interfaces;
 using Semana10Sales.DOMAIN.Infrastructure.Data;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Semana10Sales.DOMAIN.Infrastructure.Repositories
 {
-    public class CustomerRepository
+    public class CustomerRepository : ICustomerRepository
     {
         private readonly SalesContext _context;
 
@@ -40,7 +41,7 @@ namespace Semana10Sales.DOMAIN.Infrastructure.Repositories
         {
             await _context.Customer.AddAsync(customer);
             int rows = await _context.SaveChangesAsync();
-            return rows>0;
+            return rows > 0;
         }
 
         //Update Customer
