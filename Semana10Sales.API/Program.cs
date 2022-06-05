@@ -1,6 +1,8 @@
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Semana10Sales.DOMAIN.Core.Interfaces;
 using Semana10Sales.DOMAIN.Infrastructure.Data;
+using Semana10Sales.DOMAIN.Infrastructure.Mapping;
 using Semana10Sales.DOMAIN.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,7 +19,16 @@ var cnx = builder.Configuration.GetConnectionString("DevConnection");
 //Add DbContext
 builder.Services.AddDbContext<SalesContext>(options => options.UseSqlServer(cnx));
 
+var config = new MapperConfiguration(cfg =>
+{
+    cfg.AddProfile(new AutomapperProfile());
 
+
+});
+
+var mapper = config.CreateMapper();
+
+builder.Services.AddSingleton(mapper);
 
 var app = builder.Build();
 

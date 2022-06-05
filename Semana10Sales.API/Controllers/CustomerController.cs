@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Semana10Sales.DOMAIN.Core.DTOs;
 using Semana10Sales.DOMAIN.Core.Entities;
 using Semana10Sales.DOMAIN.Core.Interfaces;
 
@@ -10,10 +12,12 @@ namespace Semana10Sales.API.Controllers
     public class CustomerController : ControllerBase
     {
         private readonly ICustomerRepository _customerRepository;
+        private readonly IMapper _mapper;
 
-        public CustomerController(ICustomerRepository customerRepository)
+        public CustomerController(ICustomerRepository customerRepository, IMapper mapper)
         {
             _customerRepository = customerRepository;
+            _mapper = mapper;
         }
 
         // GET: api/Customer
@@ -21,7 +25,9 @@ namespace Semana10Sales.API.Controllers
         public async Task<IActionResult> GetAll()
         {
             var customers = await _customerRepository.GetAll();
-            return Ok(customers);
+            var customersList = _mapper.Map<IEnumerable<CustomerDTO>>(customers);
+            
+            return Ok(customersList);
         }
 
         // GET: api/Customer/GetById/5
@@ -32,8 +38,8 @@ namespace Semana10Sales.API.Controllers
             //Validated is null
             if(customer == null)
                 return NotFound();
-            
-            return Ok(customer);
+            var customerDTO = _mapper.Map<CustomerDTO>(customer);
+            return Ok(customerDTO);
         }
         // GET: api/Customer/GetByIdQueryParams?id=5
         [HttpGet("GetByIdQueryParams")]
@@ -43,25 +49,26 @@ namespace Semana10Sales.API.Controllers
             //Validated is null
             if (customer == null)
                 return NotFound();
-
-            return Ok(customer);
+            var customerDTO = _mapper.Map<CustomerDTO>(customer);
+            return Ok(customerDTO);
         }
 
         // POST: api/Customer/Insert
         [HttpPost("Insert")]
-        public async Task<IActionResult> Insert([FromBody] Customer customer)
+        public async Task<IActionResult> Insert([FromBody] CustomerPostDTO customerDTO)
         {
+            var customer = _mapper.Map<Customer>(customerDTO);
             var result = await _customerRepository.Insert(customer);
             return Ok(result);
         }
 
         // PUT: api/Customer/Update/{id}
         [HttpPut("Update/{id}")]
-        public async Task<IActionResult> Update(int id,[FromBody] Customer customer)
+        public async Task<IActionResult> Update(int id,[FromBody] CustomerDTO customerDTO)
         {
-            if (id != customer.Id)
+            if (id != customerDTO.Id)
                 return BadRequest();
-
+            var customer = _mapper.Map<Customer>(customerDTO);
             var result = await _customerRepository.Update(customer);
             return Ok(result);
         }
